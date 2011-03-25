@@ -978,18 +978,29 @@ window.MediaElement = mejs.MediaElement;
 			t.node.player = t;
 		}
 		
-		t.isVideo = (t.media.tagName.toLowerCase() === 'video');
+        var tagName = t.media.tagName.toLowerCase();
+		t.isVideo = (tagName === 'video');
 				
-		/* FUTURE WORK = create player without existing <video> or <audio> node
+		/* FUTURE WORK = create player without existing <video> or <audio> node*/
 		
 		// if not a video or audio tag, then we'll dynamically create it
 		if (tagName == 'video' || tagName == 'audio') {
 			t.$media = $($node);
-		} else if (o.tagName !== '' && o.src !== '') {
+		} else if (tagName !== '') {
+            var srcElem = $node[0];
+            // setup attributes based on tagname
+            switch(tagName){
+                case 'a':{o.src = srcElem.href;} // use href as src from a tag            
+            }
+            // default mode to auto
+            if( !o.mode || o.mode == '' ){ o.mode = 'auto'; }
 			// create a new node
 			if (o.mode == 'auto' || o.mode == 'native') {
 				
-				$media = $(o.tagName);
+                // TODO: auto-detect correct tag to create based on src file extension
+                // default tag to audio
+                if( !o.tagName || o.tagName == '' ){ o.tagName = 'audio'; }
+				$media = $('<' + o.tagName + '>');
 				if (typeof o.src == 'string') {
 					$media.attr('src',o.src);
 				} else if (typeof o.src == 'object') {
@@ -1011,8 +1022,8 @@ window.MediaElement = mejs.MediaElement;
 					$media.attr('height',o.videoHeight);
 				}
 				
-				$node.clear();
-				$node.append($media);
+				//$node.clear();
+				$node.replaceWith($media);
 				t.$media = $media;
 			} else if (o.mode == 'shim') {
 				$media = $();
@@ -1023,7 +1034,7 @@ window.MediaElement = mejs.MediaElement;
 			// fail?
 			return;
 		}	
-		*/
+		
 		
 		t.init();
 
